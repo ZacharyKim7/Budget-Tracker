@@ -5,6 +5,7 @@ An all-in-one budget &amp; expense tracking app.
 
 ```
 cd opus-frontend
+npm install
 npm run dev
 ```
 
@@ -14,3 +15,6 @@ To add a Shadcn component, run:
 ```
 npx shadcn@latest add card
 ```
+
+## Dependencies
+firebase
