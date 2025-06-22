@@ -1,17 +1,92 @@
 import { GalleryVerticalEnd } from "lucide-react"
+import { useState } from "react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { signUpWithPassword } from "@/api/firebase-auth"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!formData.email) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters long";
+    }
+
+    // Confirm password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      await signUpWithPassword(formData.email, formData.password);
+      // Success - you might want to redirect or show success message
+      console.log("Signup successful!");
+    } catch (error) {
+      console.error("Signup error:", error);
+      setErrors({ submit: "Failed to create account. Please try again." });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
             <a
@@ -36,36 +111,57 @@ export function SignupForm({
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
-                type="email"
                 name="email"
+                type="email"
                 placeholder="m@example.com"
                 autoComplete="email"
                 required
+                value={formData.email}
+                onChange={handleInputChange}
+                className={cn(errors.email && "border-red-500 focus:border-red-500")}
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email}</p>
+              )}
             </div>
             <div className="grid gap-3">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Create a Password</Label>
               <Input
                 id="password"
-                type="password"
                 name="password"
+                type="password"
                 placeholder="Password"
                 autoComplete="new-password"
                 required
+                value={formData.password}
+                onChange={handleInputChange}
+                className={cn(errors.password && "border-red-500 focus:border-red-500")}
               />
+              {errors.password && (
+                <p className="text-sm text-red-500">{errors.password}</p>
+              )}
             </div>
             <div className="grid gap-3">
               <Input
-                id="password"
+                id="confirmPassword"
+                name="confirmPassword"
                 type="password"
-                name="password"
                 placeholder="Confirm Password"
                 autoComplete="new-password"
                 required
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+                className={cn(errors.confirmPassword && "border-red-500 focus:border-red-500")}
               />
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500">{errors.confirmPassword}</p>
+              )}
             </div>
-            <Button type="submit" className="w-full">
-              Login
+            {errors.submit && (
+              <p className="text-sm text-red-500 text-center">{errors.submit}</p>
+            )}
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creating Account..." : "Sign Up"}
             </Button>
           </div>
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
