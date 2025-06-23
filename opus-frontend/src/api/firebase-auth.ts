@@ -1,4 +1,10 @@
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup
+} from "firebase/auth";
 import app from "./firebaseconfig";
 
 const auth = getAuth(app);
@@ -34,4 +40,20 @@ function signInEmailPassword(email: string, password: string): Promise<any> {
         });
 }
 
-export { signUpWithPassword, signInEmailPassword };
+const provider = new GoogleAuthProvider();
+
+// There is no difference between signing in and signing up using Google SSO
+function signInOrSignUpWithGoogle(): Promise<any> {
+    return signInWithPopup(auth, provider)
+        .then((result) => {
+            const user = result.user;
+            console.log("✅ Google sign-in successful:", user.email);
+            return user;
+        })
+        .catch((error) => {
+            console.error("❌ Google sign-in error:", error.code, error.message);
+            throw error;
+        });
+}
+
+export { signUpWithPassword, signInEmailPassword, signInOrSignUpWithGoogle };
