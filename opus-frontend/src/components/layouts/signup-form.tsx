@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signUpWithPassword, signInOrSignUpWithGoogle } from "@/api/firebase-auth"
+import { useNavigate } from "react-router"
 
 export function SignupForm({
   className,
@@ -18,6 +19,8 @@ export function SignupForm({
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  let navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
@@ -75,6 +78,7 @@ export function SignupForm({
     try {
       await signUpWithPassword(formData.email, formData.password);
       // Success - you might want to redirect or show success message
+      navigate("/dashboard")
       console.log("Signup successful!");
     } catch (error) {
       console.error("Signup error:", error);
@@ -189,6 +193,7 @@ export function SignupForm({
                 try {
                   await signInOrSignUpWithGoogle();
                   // Success: redirect or show success message here
+                  navigate("/dashboard");
                   console.log("Google sign-up successful!");
                 } catch (error: any) {
                   setErrors({ submit: error.message || "Failed to sign up with Google. Please try again." });

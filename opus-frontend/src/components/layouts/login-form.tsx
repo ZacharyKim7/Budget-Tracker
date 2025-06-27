@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { signInEmailPassword, signInOrSignUpWithGoogle } from "@/api/firebase-auth"
+import { useNavigate } from "react-router"
 
 export function LoginForm({
   className,
@@ -19,6 +20,8 @@ export function LoginForm({
   const [formData, setFormData] = useState({ email: "", password: "" })
   const [errors, setErrors] = useState<{ [key: string]: string }>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  let navigate = useNavigate();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -43,6 +46,7 @@ export function LoginForm({
     try {
       await signInEmailPassword(formData.email, formData.password)
       // Success: redirect or show success message here
+      navigate("/dashboard");
       console.log("Sign in successful!")
     } catch (error: any) {
       setErrors({ submit: error.message || "Failed to sign in. Please try again." })
@@ -83,6 +87,7 @@ export function LoginForm({
                     try {
                       await signInOrSignUpWithGoogle();
                       // Success: redirect or show success message here
+                      navigate("/dashboard")
                       console.log("Google sign-in successful!");
                     } catch (error: any) {
                       setErrors({ submit: error.message || "Failed to sign in with Google. Please try again." });
