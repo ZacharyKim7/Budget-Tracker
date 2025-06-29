@@ -7,13 +7,15 @@ export default function LandingPage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-orange-100 to-white">
       <header className="w-full flex justify-between items-center px-8 py-4 bg-white shadow-md">
         <div className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-orange-500">Monarch</span>
+          <span className="text-2xl font-bold text-orange-500">Opus</span>
         </div>
         <nav className="space-x-4">
-          <button className="text-gray-700 hover:text-orange-500">Sign In</button>
+          <button
+            className="text-gray-700 hover:text-orange-500"
+            onClick={() => navigate('/login')}>Sign In</button>
           <button
             className="bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition"
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/signup')}
           >
             Sign up
           </button>
@@ -26,7 +28,7 @@ export default function LandingPage() {
         </p>
         <button
           className="bg-orange-500 text-white px-8 py-3 rounded text-lg font-semibold hover:bg-orange-600 transition"
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/signup')}
         >
           Sign up
         </button>
